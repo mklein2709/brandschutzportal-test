@@ -165,3 +165,17 @@ main > section.card.wizard-active,.result-card.wizard-active{display:grid}
 .survey-mark:focus,.survey-mark:focus-visible{outline:2px solid #ef4a43!important;outline-offset:3px!important}
 .survey-mark.has-photo::after{right:-10px!important;bottom:-10px!important}
 @media(max-width:760px){.survey-mark,.survey-mark img{width:32px!important;height:32px!important}.symbol-palette button img{width:32px!important;height:32px!important}}
+
+
+/* V35 – Desktop-Bedienung; Touch-Verhalten aus V34 bleibt erhalten */
+#surveyType{appearance:auto!important;-webkit-appearance:menulist!important;padding-right:34px!important;cursor:pointer}
+.survey-image.hidden{display:none!important}
+.survey-mark{width:calc(30px * var(--mark-scale,1))!important;height:calc(30px * var(--mark-scale,1))!important}
+.survey-mark img{width:100%!important;height:100%!important}
+.survey-mark.dragging{opacity:.45!important}
+.survey-context-menu{position:fixed;z-index:2000;width:205px;background:#fff;color:#152126;border:1px solid #bcc8cc;border-radius:10px;box-shadow:0 12px 34px #0003;padding:7px;font:14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif}
+.survey-context-menu .ctx-title{padding:8px 9px;font-weight:800;border-bottom:1px solid #e1e7e9;margin-bottom:4px}
+.survey-context-menu button{display:block;width:100%;border:0;background:#fff;color:#152126;text-align:left;padding:8px 9px;border-radius:6px;cursor:pointer}
+.survey-context-menu button:hover{background:#f1f5f6}.survey-context-menu button.danger{color:#c8322d}.survey-context-menu hr{border:0;border-top:1px solid #e1e7e9;margin:4px 0}
+@media(hover:hover) and (pointer:fine){.symbol-palette button[data-label]{cursor:grab}.symbol-palette button[data-label]:active,.survey-mark:active{cursor:grabbing}.survey-mark{cursor:grab}}
+@media(max-width:760px){.survey-mark{width:calc(32px * var(--mark-scale,1))!important;height:calc(32px * var(--mark-scale,1))!important}}
