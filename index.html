@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101518">
+  <title>Plankosten berechnen | Mein Brandschutzportal</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<header class="site-header"><div class="shell header-row"><div class="brand-lockup"><img class="brand-logo-img" src="portal-logo.png" alt=""><div class="brand-copy"><div class="brand">Mein <span>Brandschutzportal</span></div><div class="brand-tagline">BRANDSCHUTZPLÄNE EINFACH VERWALTEN</div></div></div>
+<div class="header-actions"><button id="loginOpen" class="account-button" type="button" aria-label="Anmelden oder Kundenportal öffnen"><span class="account-icon">♙</span><span>Anmelden</span></button><div class="mode-control" aria-label="Darstellung"><span class="mode-title">Modus</span><div class="mode-row"><span>Hell</span><button id="themeToggle" class="theme-switch" type="button" role="switch" aria-checked="false" aria-label="Zwischen hellem und dunklem Modus wechseln"><span class="switch-knob"></span></button><span>Dunkel</span></div></div></div></div></header>
+
+<div id="loginModal" class="portal-modal hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="portal-modal-card">
+    <button id="loginClose" class="modal-close" type="button" aria-label="Schließen">×</button>
+    <div class="eyebrow">KUNDENBEREICH</div><h2 id="loginTitle">Willkommen zurück</h2>
+    <p class="portal-muted">Melden Sie sich an, um Ihre Objekte, Pläne und Aktualitätsprüfungen zu verwalten.</p>
+    <label class="field-label" for="loginEmail">E-Mail-Adresse</label><input id="loginEmail" type="email" placeholder="name@unternehmen.de">
+    <label class="field-label field-gap" for="loginPassword">Passwort</label><input id="loginPassword" type="password" placeholder="••••••••">
+    <button id="demoLogin" class="portal-primary" type="button">Anmelden</button>
+    <button id="forgotPassword" class="portal-link" type="button">Passwort vergessen?</button>
+    <div class="modal-divider"><span>oder</span></div>
+    <button id="registerDemo" class="portal-secondary" type="button">Konto erstellen</button>
+    <p class="demo-note">Prototyp: Anmeldung und Registrierung werden noch nicht gespeichert.</p>
+  </div>
+</div>
+
+<section id="customerPortal" class="customer-portal hidden">
+ <div class="shell portal-shell">
+  <div class="portal-topbar"><div><div class="eyebrow">MEIN KUNDENBEREICH</div><h1>Ihre Brandschutzpläne</h1><p class="lead">Objekte, Planstände und Aktualisierungen an einem Ort.</p></div><button id="portalLogout" class="portal-secondary compact" type="button">Zur Kalkulation</button></div>
+  <div class="portal-summary-grid">
+   <article class="portal-stat"><span>Objekte</span><strong>1</strong><small>im Kundenbereich</small></article>
+   <article class="portal-stat"><span>Pläne</span><strong>6</strong><small>aktuelle Dokumente</small></article>
+   <article class="portal-stat status-ok"><span>Aktualität</span><strong id="freshnessStatus">Aktuell</strong><small id="freshnessSummary">Nächste Prüfung: 14.05.2028</small></article>
+  </div>
+  <article class="portal-object">
+   <div class="object-head"><div><span class="status-pill">AKTUELL</span><h2>Musterobjekt · Verwaltung</h2><p>49080 Osnabrück · <span id="lastCheckedText">zuletzt geprüft am 14.05.2026</span></p></div><button class="portal-secondary compact" type="button">Objektdaten</button></div>
+   <div class="freshness-box"><div><strong>Sind die Angaben noch aktuell?</strong><p>Bitte informieren Sie uns, wenn sich Grundrisse, Nutzungen, Fluchtwege oder brandschutzrelevante Einrichtungen geändert haben.</p></div><div class="freshness-actions"><button id="stillCurrent" class="portal-secondary" type="button">Ja, alles aktuell</button><button id="changedSomething" class="portal-primary" type="button">Es hat sich etwas geändert</button></div></div>
+   <div id="changePanel" class="change-panel hidden"><h3>Was hat sich geändert?</h3><div class="portal-checks"><label><input type="checkbox"> Grundriss / Raumaufteilung</label><label><input type="checkbox"> Nutzung von Räumen</label><label><input type="checkbox"> Flucht- oder Rettungswege</label><label><input type="checkbox"> Feuerlöscher / Melder / Erste Hilfe</label><label><input type="checkbox"> Sonstiges</label></div><label class="field-label field-gap" for="changeReporter">Wer meldet die Änderung?</label><input id="changeReporter" type="text" autocomplete="name" placeholder="Vor- und Nachname"><textarea id="changeNote" rows="3" placeholder="Kurzer Hinweis zur Änderung …"></textarea><div class="request-action-row"><button id="requestUpdate" class="portal-primary" type="button">Aktualisierung anfragen</button><span class="request-help-wrap"><button id="requestHelp" class="help" type="button" aria-label="Was passiert nach der Aktualisierungsanfrage?" aria-expanded="false">?</button><span class="tooltip request-tooltip" role="tooltip">Nach Ihrer Anfrage wird Mein Brandschutzportal aktiv. Sie erhalten zunächst eine Bestätigung per E-Mail. Wir prüfen anschließend die betroffenen Planunterlagen und Ihre Angaben. Falls noch Informationen, Fotos oder Unterlagen fehlen, melden wir uns per E-Mail oder telefonisch bei Ihnen. Erst danach erfolgt die eigentliche Aktualisierung.</span></span></div><p id="updateRequestStatus" class="request-status hidden"></p></div>
+   <div class="survey-launch"><div><span class="future-badge">DIGITALE BESTANDSAUFNAHME</span><h3>Einrichtungen direkt im Grundriss eintragen</h3><p>Laden Sie einen Grundriss hoch und markieren Sie Feuerlöscher, Melder, Erste Hilfe und weitere relevante Einrichtungen. Geeignet für Ersterstellungen und Aktualisierungen.</p></div><button id="openSurveyTool" class="portal-primary" type="button">Bestandsaufnahme starten</button></div>
+   <h3 class="portal-section-title">Pläne & Unterlagen</h3>
+   <div class="plan-list"><div class="plan-row"><div class="file-icon">PDF</div><div><strong>Flucht- und Rettungsplan · Erdgeschoss</strong><small>Revision 14.05.2026 · PDF</small></div><div class="plan-actions"><button type="button">Ansehen</button><button type="button">Herunterladen</button></div></div><div class="plan-row"><div class="file-icon">PDF</div><div><strong>Flucht- und Rettungsplan · 1. Obergeschoss</strong><small>Revision 14.05.2026 · PDF</small></div><div class="plan-actions"><button type="button">Ansehen</button><button type="button">Herunterladen</button></div></div></div>
+   <div class="upload-zone"><div class="upload-icon">＋</div><h3>Unterlagen oder Fotos hochladen</h3><p>Grundrisse, PDFs oder Fotos direkt vom Smartphone hinzufügen.</p><input id="portalUpload" type="file" multiple accept="image/*,.pdf,.dwg,.dxf" hidden><div class="upload-actions"><button id="chooseUpload" class="portal-primary" type="button">Dateien auswählen</button><label class="portal-secondary camera-label" for="cameraUpload">Foto aufnehmen</label><input id="cameraUpload" type="file" accept="image/*" capture="environment" hidden></div><p id="uploadStatus" class="demo-note">Im Prototyp werden Dateien noch nicht übertragen.</p></div>
+  </article>
+ </div>
+</section>
+
+<div id="surveyModal" class="survey-modal hidden" role="dialog" aria-modal="true" aria-labelledby="surveyTitle">
+  <div class="survey-card">
+    <div class="survey-head"><div><div class="eyebrow">DIGITALE BESTANDSAUFNAHME · PROTOTYP V31</div><h2 id="surveyTitle">Einrichtungen im Grundriss erfassen</h2><p>PDF laden, Symbol auswählen und direkt im Plan platzieren. Eintragungen können verschoben und mit Foto/Notiz ergänzt werden.</p></div><button id="closeSurveyTool" class="modal-close" type="button" aria-label="Schließen">×</button></div>
+    <div class="survey-meta"><label>Vorgang<select id="surveyType"><option>Ersterstellung</option><option>Aktualisierung</option></select></label><label>Geschoss<input id="surveyFloor" value="Erdgeschoss"></label><label>Erfasst durch<input id="surveyReporter" autocomplete="name" placeholder="Vor- und Nachname"></label></div>
+    <div class="survey-toolbar"><input id="surveyPlan" type="file" accept="application/pdf,.pdf,image/*" hidden><button id="chooseSurveyPlan" class="portal-primary" type="button">Grundriss laden</button><button id="loadExamplePlan" class="portal-secondary" type="button">Beispiel-PDF laden</button><span id="surveyFileName" class="demo-note">Noch kein Grundriss geladen</span><button id="surveyZoomOut" class="portal-secondary compact" type="button">−</button><span id="surveyZoomLabel">100 %</span><button id="surveyZoomIn" class="portal-secondary compact" type="button">+</button></div>
+    <div class="survey-layout">
+      <aside class="symbol-palette"><strong>Symbol wählen</strong>
+        <button data-symbol="🧯" data-label="Feuerlöscher" type="button">🧯 Feuerlöscher</button><button data-symbol="🔴" data-label="Handfeuermelder" type="button">🔴 Handfeuermelder</button><button data-symbol="●" data-label="Brandmelder" type="button">● Brandmelder</button><button data-symbol="✚" data-label="Erste Hilfe" type="button">✚ Erste Hilfe</button><button data-symbol="🚪" data-label="Notausgang" type="button">🚪 Notausgang</button><button data-symbol="H" data-label="Wandhydrant" type="button">H Wandhydrant</button><button data-symbol="⚡" data-label="Elektro / Abschaltung" type="button">⚡ Elektro / Abschaltung</button><button data-symbol="?" data-label="Sonstiges / Rückfrage" type="button">? Sonstiges</button>
+        <p class="demo-note">Symbol wählen → in den Plan tippen. Markierung antippen, um Details zu bearbeiten.</p>
+      </aside>
+      <div id="surveyViewport" class="survey-viewport"><div id="surveyCanvas" class="survey-canvas"><canvas id="surveyPdfCanvas" class="hidden"></canvas><img id="surveyImage" class="hidden" alt="Geladener Grundriss"><div id="surveyEmpty" class="survey-empty"><strong>Noch kein Grundriss geladen</strong><span>PDF oder Bild auswählen.</span></div><div id="surveyMarks" class="survey-marks"></div></div></div>
+    </div>
+    <div id="markEditor" class="mark-editor hidden"><div><strong id="markEditorTitle">Eintragung</strong><span id="markEditorId" class="status-pill"></span></div><label>Hinweis<input id="markNote" type="text" placeholder="z. B. 6-kg-Schaumlöscher neben Tür"></label><div class="mark-photo-row"><label class="portal-secondary camera-label" for="markPhoto">📷 Foto aufnehmen / auswählen</label><input id="markPhoto" type="file" accept="image/*" capture="environment" hidden><span id="markPhotoStatus">Noch kein Foto</span></div><div class="mark-editor-actions"><button id="markDone" class="portal-primary" type="button">Übernehmen</button><button id="markDelete" class="portal-secondary" type="button">Eintragung löschen</button></div><p class="demo-note"><strong>Foto empfohlen:</strong> Ein Foto direkt an der Markierung erleichtert die fachliche Kontrolle und reduziert Rückfragen.</p></div>
+    <div class="survey-bottom"><div><strong id="surveyCount">0 Eintragungen</strong><span id="surveySelected"></span></div><div><button id="surveySave" class="portal-secondary" type="button">Zwischenstand speichern</button><button id="surveyExport" class="portal-secondary" type="button">Erfassung exportieren</button><button id="surveySubmit" class="portal-primary" type="button">Bestandsaufnahme übermitteln</button></div></div>
+    <p id="surveyStatus" class="request-status hidden"></p>
+  </div>
+</div>
+
+<main class="shell">
+  <div class="eyebrow">ONLINE-KALKULATION</div>
+  <h1>Plankosten berechnen</h1>
+  <p class="lead">Mit wenigen Angaben erhalten Sie eine erste unverbindliche Kostenschätzung.</p>
+  <div class="form-progress" aria-live="polite"><div><strong id="progressText">ca. 3 Minuten · Schritt 1 von 9</strong><span>Sie müssen keine Fachfragen beantworten – „Weiß ich nicht“ ist völlig in Ordnung.</span></div><div class="progress-track"><span id="progressBar"></span></div></div>
+
+  <section class="card">
+    <div class="step">1</div><div class="content">
+      <div class="intro-box intro-box-step1">
+        <b>So funktioniert die Online-Kalkulation</b>
+        <p>Es folgen 9 kurze Fragen. Fachwissen ist nicht erforderlich – wenn Sie etwas nicht wissen, wählen Sie einfach „Weiß ich nicht“, sofern diese Möglichkeit angeboten wird.</p>
+        <p>Am Ende können Sie die Kostenschätzung nur für sich als PDF herunterladen oder an Mein Brandschutzportal senden und um ein verbindliches Angebot bitten.</p>
+        <p>Sie können ohne persönliche Kontaktdaten kalkulieren. Wenn Sie Ihre E-Mail-Adresse angeben, kann die Kalkulation später Ihrem Kundenbereich zugeordnet werden. Sobald der Kundenbereich verfügbar ist und noch kein Login besteht, erhalten Sie eine Einladung zur Registrierung. Dort können Kalkulationen künftig gespeichert, angepasst und in eine Angebotsanfrage umgewandelt werden.</p>
+        <p>Fragen oder direkt ein verbindliches Angebot? <strong>kontakt@mein-brandschutzportal.de</strong> · Mobil <strong>0176 24137533</strong></p>
+      </div>
+      <h2>Angaben zum Objekt</h2>
+      <p class="hint">Die Objektadresse wird unabhängig von einem Vor-Ort-Termin benötigt – unter anderem zur eindeutigen Zuordnung und zur fachlichen Vorprüfung des Objekts.</p>
+
+      <label class="field-label" for="customerName">Ihr Name / Unternehmen <span class="optional">(optional)</span></label>
+      <input id="customerName" type="text" autocomplete="organization" placeholder="z. B. Muster GmbH">
+
+      <label class="field-label field-gap" for="contactName">Ansprechpartner <span class="optional">(optional)</span></label>
+      <input id="contactName" type="text" autocomplete="name" placeholder="z. B. Frau Müller / Herr Schmidt">
+
+      <div class="contact-grid">
+        <div><label class="field-label field-gap" for="customerEmail">E-Mail-Adresse <span class="optional">(optional)</span></label><input id="customerEmail" type="email" autocomplete="email" placeholder="name@unternehmen.de"></div>
+        <div><label class="field-label field-gap" for="customerPhone">Telefon <span class="optional">(optional)</span></label><input id="customerPhone" type="tel" autocomplete="tel" placeholder="z. B. 0541 …"></div>
+        <div><label class="field-label field-gap" for="customerMobile">Mobil <span class="optional">(optional)</span></label><input id="customerMobile" type="tel" autocomplete="tel" placeholder="z. B. 0171 …"></div>
+      </div>
+      <p class="microcopy">Die Kontaktdaten sind freiwillig. Ohne Angabe können Sie die Kalkulation trotzdem vollständig durchführen und als PDF herunterladen.</p>
+
+      <label class="field-label field-gap question-inline" for="address">Objektadresse <span class="required-mark">*</span>
+<button class="help" type="button" aria-label="Hinweis zur anonymen Kalkulation" aria-expanded="false">?</button>
+<span class="tooltip" role="tooltip">Sie möchten zunächst anonym kalkulieren? Dann genügt die Angabe der Stadt bzw. des Ortes. Für ein verbindliches Angebot benötigen wir später die vollständige Objektadresse.</span></label>
+      <input id="address" type="text" required autocomplete="street-address" placeholder="Straße, Hausnummer, PLZ, Ort">
+      <p id="addressCheckStatus" class="route-status"></p>
+
+      <label class="field-label field-gap" for="usage">Wie wird das Objekt überwiegend genutzt? <span class="required-mark">*</span></label>
+      <select id="usage" required>
+        <option value="">Bitte auswählen …</option>
+        <option>Büro / Verwaltung</option>
+        <option>Gewerbe / Betrieb</option>
+        <option>Industrie / Produktion</option>
+        <option>Lager / Logistik</option>
+        <option>Verkaufsstätte / Einzelhandel</option>
+        <option>Hotel / Beherbergungsstätte</option>
+        <option>Krankenhaus / Klinik</option>
+        <option>Pflegeheim / Pflegeeinrichtung</option>
+        <option>Kita / Kindergarten</option>
+        <option>Schule / Bildungseinrichtung</option>
+        <option>Versammlungsstätte / Veranstaltungsbereich</option>
+        <option>Gastronomie</option>
+        <option>Praxis / medizinische Einrichtung</option>
+        <option>Wohngebäude</option>
+        <option>Parkhaus / Tiefgarage</option>
+        <option>Sport- / Freizeiteinrichtung</option>
+        <option value="mixed">Weiß ich nicht / gemischte Nutzung</option>
+        <option value="other">Sonstige Nutzung / nicht aufgeführt</option>
+      </select>
+      <div id="usageOtherWrap" class="subpanel hidden">
+        <label id="usageOtherLabel" class="field-label" for="usageOther">Nutzung kurz beschreiben <span class="required-mark">*</span></label>
+        <input id="usageOther" type="text" placeholder="z. B. Büro, Werkstatt und Lager">
+      </div>
+
+      <div id="routeControls" class="hidden" aria-hidden="true">
+        <button id="routeButton" type="button" tabindex="-1">Route intern berechnen</button>
+        <p id="routeStatus" class="route-status"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">2</div><div class="content">
+      <h2>Welche Grundrissunterlagen liegen vor?</h2>
+      <div class="options">
+        <label class="option"><input type="radio" name="source" value="cad"><span><b>Ich habe CAD-Dateien</b><small>z. B. DWG, DXF oder PLN / Archicad</small></span></label>
+        <label class="option"><input type="radio" name="source" value="pdf"><span><b>Ich habe PDF- oder Papierpläne</b><small>Mein Brandschutzportal prüft anschließend, wie gut diese als Grundlage geeignet sind.</small></span></label>
+        <label class="option"><input type="radio" name="source" value="none" checked><span><b>Ich habe keine oder nur sehr alte / unvollständige Pläne</b><small>Für die Vorkalkulation setzen wir vorsorglich ein Vor-Ort-Aufmaß an.</small></span></label>
+      </div>
+      <div id="planQualityNote" class="info-box hidden">
+        <b>Mehr müssen Sie an dieser Stelle nicht beurteilen.</b>
+        <p>Mein Brandschutzportal prüft später fachlich, ob die Unterlagen aktuell und ausreichend sind. Hilfreich ist, wenn Raumbezeichnungen bzw. Nutzungen erkennbar sind – fehlende oder unklare Angaben können später ergänzt werden.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">3</div><div class="content">
+      <h2 id="inventoryHeading">Wer soll die Angaben vor Ort aufnehmen?</h2>
+      <p id="inventoryHint" class="hint">Kein Fachwissen nötig: Entscheiden Sie nur, ob wir den Vor-Ort-Abgleich übernehmen oder ob Sie die Angaben selbst erfassen möchten.</p>
+      <div class="options">
+        <label id="customerInventoryOption" class="option"><input type="radio" name="inventory" value="customer"><span><b>Ich möchte die Angaben selbst erfassen</b><small>Wir führen Sie später Schritt für Schritt durch die benötigten Angaben.</small></span></label>
+        <label id="usInventoryOption" class="option"><input type="radio" name="inventory" value="us" checked><span><b>Mein Brandschutzportal übernimmt das für Sie</b><small>Die relevanten Gegebenheiten werden bei einem Termin vor Ort abgeglichen.</small></span></label>
+      </div>
+
+      <div id="customerInventory" class="warning-box">
+        <b>Wichtig: Verantwortung bei eigener Erfassung</b>
+        <p>Wenn Sie die Angaben selbst erfassen, sind Sie dafür verantwortlich, den tatsächlichen Zustand vor Ort sorgfältig und vollständig wiederzugeben. Dazu gehören erkennbare Abweichungen vom Grundriss sowie die von Mein Brandschutzportal abgefragten brandschutz- und rettungsrelevanten Einrichtungen. Ihre Angaben werden anschließend fachlich geprüft.</p>
+        <p><strong>Wenn Sie bei einzelnen Punkten unsicher sind, können Sie jederzeit die Aufnahme durch Mein Brandschutzportal wählen.</strong> Alternativ laden Sie Ihre Pläne hoch und erfassen die Positionen von Feuerlöschern, Wandhydranten, Brandmeldern, Erste-Hilfe-Einrichtungen und weiteren relevanten Punkten mit dem digitalen Erfassungstool direkt im Plan.</p>
+        <div class="future-tool"><span class="future-badge">IN VORBEREITUNG</span><b>Geführte digitale Bestandsaufnahme</b><p>Nach Auftragserteilung führt Sie Mein Brandschutzportal Schritt für Schritt durch die Erfassung. Sie markieren z. B. Feuerlöscher, Wandhydranten, Brandmelder und Erste-Hilfe-Einrichtungen direkt im Grundriss und können Fotos oder Hinweise ergänzen.</p></div>
+      </div>
+
+      <div id="onsiteInventory" class="info-box hidden">
+        <b>Vor-Ort-Termin</b>
+        <p id="onsiteContinueHint"><strong>Ein Vor-Ort-Termin ist aufgrund Ihrer bisherigen Angaben erforderlich.</strong> Sie müssen hier nichts weiter auswählen und können direkt auf „Weiter“ klicken.</p>
+        <p>Für die Kalkulation werden die Fahrtstrecke mit 0,70 €/km und die Fahrzeit mit 75 €/Stunde für Hin- und Rückfahrt berücksichtigt.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">4</div><div class="content">
+      <h2 class="question-with-help">Wie werden die Pläne benötigt?
+        <button class="help" type="button" aria-label="Hinweis zu den Planformaten" aria-expanded="false">?</button>
+        <span class="tooltip" role="tooltip">DIN A3 ist nach DIN ISO 23601 die Mindestgröße für Flucht- und Rettungspläne und für die meisten Objekte das übliche Format. Für Pläne, die in einzelnen Räumen angebracht werden – zum Beispiel in Hotelzimmern – darf DIN A4 verwendet werden. Bei größeren oder komplexeren Darstellungen kann ein größeres Format erforderlich sein. Die automatische Kalkulation basiert zunächst auf DIN A3; das endgültige Format wird fachlich geprüft.</span>
+      </h2>
+      <div class="options">
+        <label class="option"><input type="radio" name="delivery" value="print" checked><span><b>Als Ausdruck und PDF</b><small>Für die automatische Kalkulation wird DIN A3 zugrunde gelegt.</small></span></label>
+        <label class="option"><input type="radio" name="delivery" value="pdfonly"><span><b>Nur digital als PDF</b><small>Keine Ausdrucke erforderlich.</small></span></label>
+      </div>
+    </div>
+  </section>
+
+  <section id="frameCard" class="card">
+    <div class="step">5</div><div class="content">
+      <h2 class="question-with-help">Werden Rahmen für die Flucht- und Rettungspläne benötigt?
+        <button class="help" type="button" aria-label="Hinweis zu den Rahmenformaten" aria-expanded="false">?</button>
+        <span class="tooltip" role="tooltip">Die Rahmen werden zunächst passend zum kalkulierten DIN-A3-Format angesetzt. Ergibt die fachliche Prüfung ein anderes Planformat, werden Rahmenformat und Preis im verbindlichen Angebot entsprechend angepasst.</span>
+      </h2>
+      <p class="hint">Pro gedrucktem Plan wird zunächst ein DIN-A3-Klapprahmen kalkuliert. Die Rahmen sind schwerentflammbar nach DIN 4102-B1. DIN A3 ist die Mindestgröße und für die meisten Objekte das übliche Format. Mengenstaffeln werden automatisch berücksichtigt.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="frames" value="yes" checked><span><b>Ja, Rahmen mitliefern</b><small>Klapprahmen silbermatt, schwerentflammbar nach DIN 4102-B1, werden passend zur Plananzahl mitkalkuliert.</small></span></label>
+        <label class="option"><input type="radio" name="frames" value="no"><span><b>Nein, Rahmen sind vorhanden / werden selbst beschafft</b><small>Es werden keine Rahmen berechnet.</small></span></label>
+      </div>
+      <div id="frameSkippedNote" class="info-box hidden"><b>Keine Auswahl erforderlich</b><p>Sie haben „Nur digital als PDF“ gewählt. Deshalb werden keine Rahmen kalkuliert. Sie können direkt auf „Weiter“ klicken.</p></div>
+      <div id="frameUnknownNote" class="info-box hidden"><b>Rahmenkosten noch offen</b><p>Da die Anzahl der Pläne noch ermittelt wird, können auch die Rahmen erst danach kalkuliert werden.</p></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">6</div><div class="content">
+      <h2 class="question-with-help">Welche Geschosse sind für diese Kalkulation relevant – und wie groß sind diese ungefähr?
+        <button class="help" type="button" aria-label="Hinweis zu relevanten Geschossen" aria-expanded="false">?</button>
+        <span class="tooltip" role="tooltip">Geben Sie nur die Geschosse an, für die Flucht- und Rettungspläne erstellt bzw. geprüft werden sollen. Beispiel: Sollen nur für Keller- und Erdgeschoss Pläne erstellt werden, geben Sie auch nur diese beiden Geschosse an – selbst wenn das Objekt weitere Geschosse besitzt. Nicht ausgebaute und nicht genutzte Dachgeschosse müssen nicht angegeben werden. Die Flächen dürfen für die Kalkulation grob geschätzt werden; die genauen Größen werden bei der fachlichen Prüfung der Unterlagen ermittelt.</span>
+      </h2>
+      <p class="hint">Bitte geben Sie anschließend für jedes relevante Geschoss die ungefähre Grundfläche an. Eine grobe Schätzung reicht für die Vorkalkulation aus.</p>
+      <select id="floorCount" required>
+        <option value="">Bitte auswählen …</option>
+        <option value="1">1 Geschoss</option><option value="2">2 Geschosse</option><option value="3">3 Geschosse</option>
+        <option value="4">4 Geschosse</option><option value="5">5 Geschosse</option><option value="6">6 Geschosse</option>
+        <option value="7">7 Geschosse</option><option value="8">8 Geschosse</option><option value="9">9 Geschosse</option><option value="10">10 Geschosse</option><option value="more">Mehr als 10 Geschosse</option>
+      </select>
+      <div id="highriseNote" class="info-box hidden"><b>Mehr als 10 relevante Geschosse</b><p>Bei größeren Objekten möchten wir die Kalkulation individuell prüfen. Bitte schreiben Sie uns an <strong>kontakt@mein-brandschutzportal.de</strong>. So vermeiden wir eine unpassende automatische Schätzung.</p></div><div id="floorAreas" class="floor-areas" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">7</div><div class="content">
+      <h2>Wie viele Flucht- und Rettungspläne werden benötigt?</h2>
+      <p class="hint">Nach ASR A2.3, Abschnitt 10, werden Flucht- und Rettungspläne an geeigneten Stellen in den betreffenden Bereichen ausgehängt – zum Beispiel in Eingangsbereichen, vor Aufzügen und Treppen sowie an Kreuzungspunkten von Verkehrswegen.</p>
+      <div class="plan-choice">
+        <label class="option"><input type="radio" name="planKnowledge" value="known"><span><b>Anzahl ist bekannt</b><small>Ich kann die benötigte Anzahl direkt angeben.</small></span></label>
+        <label class="option"><input type="radio" name="planKnowledge" value="unknown" checked><span><b>Weiß ich nicht / steht noch nicht fest</b></span></label>
+      </div>
+      <div id="knownPlans" class="subpanel">
+        <label class="field-label" for="plans">Anzahl der Pläne</label>
+        <input id="plans" type="number" inputmode="numeric" min="1" value="1">
+      </div>
+      <div id="unknownPlans" class="subpanel hidden">
+        <div class="info-box">
+          <b>Beurteilung von Anzahl und Standorten (Aufhängorten)</b>
+          <p>Wenn Sie unsicher sind, ob Anzahl und Aufhängorte der vorhandenen Flucht- und Rettungspläne noch passen, beurteilen wir das im Rahmen der fachlichen Prüfung. Für die Vorkalkulation setzen wir automatisch 2 Pläne je angefangenen 200 m² relevanter Geschossfläche an.</p>
+          <p>Sollen vorhandene Pläne lediglich aktualisiert und grundsätzlich an denselben Standorten ersetzt werden, können wir die bisherige Anzahl zunächst 1:1 übernehmen. Dabei aktualisieren wir insbesondere die Grundrisse und bringen die Plandarstellung auf den aktuellen Stand. Wir empfehlen aber eine Neubewertung anhand der heutigen Nutzung und der aktuellsten DIN.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">8</div><div class="content">
+      <h2>Werden zusätzliche Planvarianten für eine Bauphase benötigt?</h2>
+      <p class="hint">Zum Beispiel bei vorübergehend gesperrten Räumen oder Staubschutzwänden, durch die sich Rettungswege während der Bauphase verändern.</p>
+      <div class="options">
+        <label class="option"><input type="radio" name="constructionVariant" value="no" checked><span><b>Nein</b><small>Nur der endgültige Zustand wird benötigt.</small></span></label>
+        <label class="option"><input type="radio" name="constructionVariant" value="yes"><span><b>Ja</b><small>Für einzelne Geschosse wird zusätzlich ein temporärer Zustand benötigt.</small></span></label>
+      </div>
+      <div id="constructionFloors" class="subpanel hidden">
+        <p class="choice-title">Welche Geschosse betrifft die Bauphase?</p>
+        <label class="check-option select-all-option"><input id="constructionAll" type="checkbox"><span><b>Alle Geschosse</b></span></label>
+        <div id="constructionFloorChoices" class="check-grid"></div>
+        <input id="constructionPlans" type="hidden" value="">
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="step">9</div><div class="content">
+      <h2>Weitere Hinweise zum Objekt oder Auftrag <span class="optional">(optional)</span></h2>
+      <p class="hint">Alles, was für die fachliche Prüfung hilfreich sein könnte.</p>
+      <textarea id="customerNotes" rows="5" placeholder="z. B. Umbau im laufenden Betrieb, gesperrte Bereiche, besondere Nutzergruppen, mehrere Gebäudeteile, vorhandenes Brandschutzkonzept, gewünschter Fertigstellungstermin …"></textarea>
+    </div>
+  </section>
+
+  <div id="wizardValidation" class="wizard-validation hidden" role="alert"></div><div class="wizard-nav"><button id="prevStep" type="button" class="wizard-secondary">Zurück</button><button id="nextStep" type="button" class="wizard-primary">Weiter</button></div>
+
+  <section class="result-card">
+    <div><div class="eyebrow muted">VORLÄUFIGE KOSTENSCHÄTZUNG</div><h2 id="resultTitle">Flucht- und Rettungspläne</h2></div>
+    <div class="price-stack"><div id="netTotal" class="total">–</div><div id="total" class="gross-total"></div></div>
+    <div id="breakdown" class="breakdown">Bitte zuerst die Anzahl der Geschosse auswählen.</div>
+    <p class="price-footnote"><strong>* Vorläufige Kostenschätzung.</strong> Die Berechnung erfolgt auf Grundlage Ihrer Angaben. Der endgültige Preis wird nach fachlicher Prüfung der Unterlagen bestätigt bzw. angepasst.</p>
+    <p class="legal">Unverbindliche automatische Kalkulation auf Basis DIN A3. Alle Einzelpreise werden netto kalkuliert. Der Bruttopreis inklusive 19 % Umsatzsteuer wird zusätzlich ausgewiesen. Ein verbindliches Angebot erfolgt erst nach fachlicher Prüfung der Angaben und Unterlagen. Abweichungen – z. B. beim erforderlichen Planformat, bei der endgültigen Plananzahl, der Bestandsaufnahme oder bei den Rahmen – werden im Angebot transparent ausgewiesen.</p>
+    <div class="result-actions">
+      <button id="submitAndPdf" type="button" class="action-primary">Kalkulation absenden &amp; als PDF herunterladen</button>
+      <button id="pdfOnly" type="button" class="action-secondary">Nur als PDF herunterladen</button>
+    </div>
+    <p id="actionStatus" class="action-status"></p>
+  </section>
+</main>
+</body>
+</html>
